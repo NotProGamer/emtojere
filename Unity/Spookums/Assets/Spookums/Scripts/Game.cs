@@ -185,6 +185,7 @@ public class Game : MonoBehaviour
                 Restart();
             }
 
+            // Quit
             if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10 + 90, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "No"))
             {
                 paused = false;
@@ -207,6 +208,7 @@ public class Game : MonoBehaviour
                 Restart();
             }
 
+            // Quit
             if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10 + 90, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "No"))
             {
                 paused = false;

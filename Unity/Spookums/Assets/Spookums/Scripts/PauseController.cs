@@ -42,6 +42,7 @@ public class PauseController : MonoBehaviour
                 game.Restart();
             }
 
+            // Quit
             if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10, ((Screen.height - menuHeight) / 2) + (3*30), 80, 20), "Quit"))
             {
                 paused = false;
