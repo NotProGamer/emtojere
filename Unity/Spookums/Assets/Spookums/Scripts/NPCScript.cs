@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NPCScript : MonoBehaviour {
-
+public class NPCScript : MonoBehaviour
+{
     private bool m_paused;
     private Vector3 m_playVelocity;
 
@@ -24,6 +24,12 @@ public class NPCScript : MonoBehaviour {
     public float maxFearRating = 5f;
     public float currentFearRating;
     public float scareRating = 1f;
+    float fadeTimer;
+    public float fadeTime = 0.5f;
+    bool fadingDown;
+    bool fadingUp;
+    Vector3 m_destination;
+    public SpriteRenderer sprite;
 
     public float GetFearRating()
     {
@@ -43,15 +49,65 @@ public class NPCScript : MonoBehaviour {
     void Start()
     {
         m_target = transform.position;
+        m_destination = transform.position;
         m_rigidbody = GetComponent<Rigidbody2D>();
         //m_anim = GetComponent<Animator>();
         currentFearRating = 0f;
+        fadeTimer = fadeTime;
+        fadingDown = false;
+        fadingUp = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (fadingDown)
+        {
+            fadeTimer -= Time.deltaTime;
+
+            // fade to invisible
+            float alpha = (fadeTimer / fadeTime);
+            SpriteRenderer renderer = sprite.GetComponent<SpriteRenderer>();
+            //gameObject.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, alpha);
+            renderer.color = new Color(255, 255, 255, alpha);
+
+            if (fadeTimer <= 0)
+            {
+                fadeTimer = 0.0f;
+                fadingDown = false;
+                fadingUp = true;
+                transform.position = m_destination;
+            }
+
+            return;
+        }
+        else if (fadingUp)
+        {
+            fadeTimer += Time.deltaTime;
+
+            // fade up to opaque
+            float alpha = (fadeTimer / fadeTime);
+            SpriteRenderer renderer = sprite.GetComponent<SpriteRenderer>();
+            //gameObject.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, alpha);
+            renderer.color = new Color(255, 255, 255, alpha);
+
+            if (fadeTimer >= fadeTime)
+            {
+                fadeTimer = fadeTime;
+                fadingUp = false;
+                UnFreezeVelocity();
+            }
+
+            return;
+        }
+
         if (m_paused) return;
+
+        // DEBUG: MANUAL TELEPORT -- REMOVE BEFORE PUBLISH
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            Teleport(m_target);
+        }
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -66,13 +122,11 @@ public class NPCScript : MonoBehaviour {
         {
             m_reactionTimer = 0;
         }
-
-
     }
 
     public void SetDirection(Vector3 source, bool lure)
     {
-        if (m_paused) return;
+        if (m_paused || fadingDown || fadingUp) return;
 
         m_reactionTimer = reactionDelay;
 
@@ -106,7 +160,7 @@ public class NPCScript : MonoBehaviour {
 
     void FixedUpdate()
     {
-        if (m_paused) return;
+        if (m_paused || fadingDown || fadingUp) return;
 
         m_grounded = Physics2D.OverlapCircle(m_groundCheck.position, m_groundRadius, whatIsGround);
         
@@ -148,7 +202,7 @@ public class NPCScript : MonoBehaviour {
     //Flip the NPC Sprite based on movement direction
     void Flip()
     {
-        if (m_paused) return;
+        if (m_paused || fadingUp || fadingDown) return;
 
         m_facingRight = !m_facingRight;
         Vector3 theScale = transform.localScale;
@@ -156,13 +210,21 @@ public class NPCScript : MonoBehaviour {
         transform.localScale = theScale;
     }
 
-    
-
-    public void Teleport(Vector3 destination)
+    public void Teleport(Vector3 destination, bool doFade = true)
     {
         if (m_paused) return;
 
-        transform.position = destination;
+        if (doFade)
+        {
+            fadeTimer = fadeTime;
+            fadingDown = true;
+            m_destination = destination;
+            FreezeVelocity();
+        }
+        else
+        {
+            transform.position = destination;
+        }
     }
 
     void OnPause()
@@ -175,6 +237,18 @@ public class NPCScript : MonoBehaviour {
     void OnResume()
     {
         m_paused = false;
+        m_rigidbody.velocity = m_playVelocity;
+        m_playVelocity = Vector3.zero;
+    }
+
+    void FreezeVelocity()
+    {
+        m_playVelocity = m_rigidbody.velocity;
+        m_rigidbody.velocity = Vector3.zero;
+    }
+
+    void UnFreezeVelocity()
+    {
         m_rigidbody.velocity = m_playVelocity;
         m_playVelocity = Vector3.zero;
     }
