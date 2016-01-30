@@ -4,21 +4,21 @@ using System.Collections;
 public class ClickableObject : MonoBehaviour {
 
 	[SerializeField] private float cooldown = 5f;
-	[SerializeField] private Sprite hoverSprite;
-	[SerializeField] private Sprite idleSprite;
 	private float clickTime = 0f;
 	private AudioSource audioSource;
-	private SpriteRenderer spriteRenderer;
+    private Animator animator;
 
 	void Start(){
 		audioSource = GetComponent<AudioSource> ();
-	}
+        animator = GetComponent<Animator>();
+    }
 
 	void OnMouseUpAsButton(){
-		if(Time.time > clickTime){
-			
-			//Trigger animation here
+        Debug.Log("MouseClick");
+        if (Time.time > clickTime){
 
+            //Trigger animation and audio here
+            animator.SetTrigger("Click");
 			audioSource.Play();
 
 			//Don't allow players to activate until cooldown is finished
@@ -27,10 +27,12 @@ public class ClickableObject : MonoBehaviour {
 	}
 
 	void OnMouseOver(){
-		spriteRenderer.sprite = hoverSprite;
+        Debug.Log("MouseOver");
+        animator.SetBool("MouseOver",true);
 	}
 
 	void OnMouseExit(){
-		spriteRenderer.sprite = idleSprite;
-	}
+        Debug.Log("MouseExit");
+        animator.SetBool("MouseOver", false);
+    }
 }
