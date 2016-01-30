@@ -60,7 +60,7 @@ public class Stairs : MonoBehaviour {
                         && GetDirection(npcScript.GetTarget()) != LureDirection.Across)
                     {
                         npcScript.Teleport(destination.position);
-                        destination.gameObject.GetComponent<Door>().SetTimer(2f);
+                        destination.gameObject.GetComponent<Stairs>().SetTimer(2f);
                     }
                 }
                 else
@@ -68,7 +68,7 @@ public class Stairs : MonoBehaviour {
                     if (Random.value >= teleportChance)
                     {
                         npcScript.Teleport(destination.position);
-                        destination.gameObject.GetComponent<Door>().SetTimer(2f);
+                        destination.gameObject.GetComponent<Stairs>().SetTimer(2f);
                     }
                     else
                     {
