@@ -5,12 +5,12 @@ public class HouseGenerator : MonoBehaviour {
 
 	public GameObject room;
 	public Material[] wallpapers;
-	public Vector2[] basementBounds;
-	public Vector2[] groundBounds;
-	public Vector2[] firstBounds;
-	public Vector2[] atticBounds;
 	public int[] numberFloors;
-	public float hRoom;
+
+	private Vector2[] basementBounds = new Vector2[2]{new Vector2(-5.7f,-3.9f), new Vector2(5.3f,-3.9f)};
+	private Vector2[] groundBounds = new Vector2[2]{new Vector2(-6.3f,-1.7f), new Vector2(6f,-1.7f)};
+	private Vector2[] firstBounds = new Vector2[2]{new Vector2(-6.3f,0.5f), new Vector2(6f,0.5f)};
+	private Vector2[] atticBounds = new Vector2[2]{new Vector2(-2,2.7f), new Vector2(2,2.7f)};
 
 	// Use this for initialization
 	void Start () {
