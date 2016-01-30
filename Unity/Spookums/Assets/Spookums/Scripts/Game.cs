@@ -5,10 +5,10 @@ public class Game : MonoBehaviour
 {
     enum GameState
     {
+        PLAY,
         WIN,
         LOSE,
-        PAUSE,
-        PLAY
+        PAUSE
     };
 
     public float maxTimer = 360;
