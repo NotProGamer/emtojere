@@ -51,6 +51,7 @@ public class Game : MonoBehaviour
             if (timer <= 0)
             {
                 // end game with dawn sequence
+                currentState = GameState.LOSE;
             }
 
             if (EverythingCollected())
@@ -137,5 +138,10 @@ public class Game : MonoBehaviour
     {
         paused = false;
         Application.Quit();
+    }
+
+    public void RegisterPickup(int index)
+    {
+        collectibles[index] = true;
     }
 }
