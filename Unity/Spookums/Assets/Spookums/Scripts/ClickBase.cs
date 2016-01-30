@@ -1,14 +1,16 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public abstract class ClickBase : MonoBehaviour
 {
-
-    [SerializeField]
-    protected float cooldown = 5f;
+	[SerializeField] protected float fearIncrement = 0.5f;
+	[SerializeField] protected float fearThreshold = 4f;
+    [SerializeField] protected float cooldown = 5f;
     protected float clickTime = 0f;
     protected AudioSource[] audioSources;
     protected Animator animator;
+	protected Slider fearMeter;
 
     NPCScript npc;
     GameObject basementMarker;
@@ -21,6 +23,7 @@ public abstract class ClickBase : MonoBehaviour
     {
         audioSources = GetComponents<AudioSource>();
         animator = GetComponent<Animator>();
+		fearMeter = GameObject.Find ("FearMeter").GetComponent<Slider> ();
 
         npc = GameObject.Find("PlayerCollider").GetComponent<NPCScript>();
 
@@ -42,10 +45,16 @@ public abstract class ClickBase : MonoBehaviour
             //Don't allow players to activate until cooldown is finished
             clickTime = Time.time + cooldown;
 
-            Debug.Log("Prop clicked.");
+			bool lure = true;
 
-            // alert player
-            npc.Alert(transform.position, true, floor, true);
+			if (fearMeter.value > fearThreshold) {
+				lure = false;
+			}
+
+			// alert player
+            npc.Alert(transform.position, lure, floor, true);
+
+			fearMeter.value += fearIncrement;
         }
     }
 

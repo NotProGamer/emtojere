@@ -1,39 +1,38 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class PickUp : MonoBehaviour {
 
     private bool m_paused;
 
-    public Transform collectedLocation;
-    public bool destroyOnPickUp = true;
+	public GameObject inventory;
+	public Sprite itemSprite;
+    public bool destroyOnPickUp = false;
+
+	private AudioSource audioClip;
 
     public enum Items
     {
-        UrnOfAshes,
-        SacrificialKnife,
-        Amulet,
+		Amulet,
+		SpellBook,
         BlackCandleWithPentagram,
-        SpellBook
+		SacrificialKnife,
+		UrnOfAshes
     }
 
     public Items inventoryIndex;
 
-	// Use this for initialization
-	void Start ()
-    {
-	
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-	
+	void Start(){
+		audioClip = GetComponent<AudioSource> ();
+		inventory = GameObject.Find ("Inventory");
 	}
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (m_paused) return;
+
+		audioClip.Play();
 
         if (other.gameObject.tag == "NPC")
         {
@@ -44,8 +43,9 @@ public class PickUp : MonoBehaviour {
             }
             else
             {
-                //Teleport to inventory location
-                gameObject.transform.position = collectedLocation.position;
+				transform.position = new Vector2 (-100, -100);
+				Debug.Log ((int)inventoryIndex);
+				inventory.transform.GetChild((int)inventoryIndex).GetComponent<Image>().sprite = itemSprite;
             }
         }
     }
