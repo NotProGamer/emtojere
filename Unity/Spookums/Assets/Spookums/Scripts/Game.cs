@@ -132,7 +132,6 @@ public class Game : MonoBehaviour
     public void Restart()
     {
         Init();
-
         currentState = GameState.PLAY;
     }
 
@@ -173,6 +172,28 @@ public class Game : MonoBehaviour
 
             // Make a background box
             GUI.Box(new Rect((Screen.width - menuWidth) / 2, (Screen.height - menuHeight) / 2, menuWidth, menuHeight), "GAME OVER!\nTry again?");
+
+            // Resume
+            if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "Yes"))
+            {
+                paused = false;
+                Restart();
+            }
+
+            if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10 + 90, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "No"))
+            {
+                paused = false;
+                Quit();
+            }
+        }
+
+        if (currentState == GameState.WIN)
+        {
+            int menuWidth = 190;
+            int menuHeight = 70;
+
+            // Make a background box
+            GUI.Box(new Rect((Screen.width - menuWidth) / 2, (Screen.height - menuHeight) / 2, menuWidth, menuHeight), "Congratulations, you win!\nPlay again?");
 
             // Resume
             if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "Yes"))
