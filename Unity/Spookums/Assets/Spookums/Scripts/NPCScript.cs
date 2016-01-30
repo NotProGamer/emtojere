@@ -30,6 +30,8 @@ public class NPCScript : MonoBehaviour
     bool fadingUp;
     Vector3 m_destination;
     public SpriteRenderer sprite;
+    Vector3 m_stairsLocation;
+    Vector3 m_longTermTarget;
 
     public float GetFearRating()
     {
@@ -56,6 +58,7 @@ public class NPCScript : MonoBehaviour
         fadeTimer = fadeTime;
         fadingDown = false;
         fadingUp = false;
+        m_longTermTarget = Vector3.zero;
     }
 
     // Update is called once per frame
@@ -77,6 +80,7 @@ public class NPCScript : MonoBehaviour
                 fadingDown = false;
                 fadingUp = true;
                 transform.position = m_destination;
+                m_target = m_longTermTarget;
             }
 
             return;
@@ -95,7 +99,7 @@ public class NPCScript : MonoBehaviour
             {
                 fadeTimer = fadeTime;
                 fadingUp = false;
-                UnFreezeVelocity();
+                //UnFreezeVelocity();
             }
 
             return;
@@ -219,7 +223,9 @@ public class NPCScript : MonoBehaviour
             fadeTimer = fadeTime;
             fadingDown = true;
             m_destination = destination;
-            FreezeVelocity();
+            m_longTermTarget = m_target;
+            m_target = m_stairsLocation;
+            //FreezeVelocity();
         }
         else
         {
@@ -251,5 +257,10 @@ public class NPCScript : MonoBehaviour
     {
         m_rigidbody.velocity = m_playVelocity;
         m_playVelocity = Vector3.zero;
+    }
+
+    public void SetStairsLocation(Vector3 location)
+    {
+        m_stairsLocation = location;
     }
 }
