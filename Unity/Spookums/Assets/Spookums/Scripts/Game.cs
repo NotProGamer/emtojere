@@ -18,6 +18,8 @@ public class Game : MonoBehaviour
     bool[] collectibles;
     GameState currentState;
 
+    public NPCScript npc;
+
     void Init()
     {
         paused = false;
@@ -25,6 +27,9 @@ public class Game : MonoBehaviour
 
         for (int i = 0; i < collectibles.Length; i++)
             collectibles[i] = false;
+
+        // place NPC at start position
+        //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0));
     }
 
     // Use this for initialization
@@ -207,6 +212,14 @@ public class Game : MonoBehaviour
                 paused = false;
                 Quit();
             }
+        }
+    }
+
+    public void AtticCheck()
+    {
+        if (EverythingCollected())
+        {
+            currentState = GameState.WIN;
         }
     }
 }
