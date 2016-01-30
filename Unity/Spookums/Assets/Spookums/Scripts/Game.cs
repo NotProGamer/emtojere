@@ -29,7 +29,7 @@ public class Game : MonoBehaviour
             collectibles[i] = false;
 
         // place NPC at start position
-        npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0), false);
+        //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0), false);
     }
 
     // Use this for initialization
