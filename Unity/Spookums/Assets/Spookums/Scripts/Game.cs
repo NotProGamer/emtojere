@@ -18,16 +18,22 @@ public class Game : MonoBehaviour
     bool[] collectibles;
     GameState currentState;
 
-    // Use this for initialization
-    void Start ()
+    void Init()
     {
         paused = false;
         timer = maxTimer;
-        dt = Time.deltaTime;
-        collectibles = new bool[5];
 
         for (int i = 0; i < collectibles.Length; i++)
             collectibles[i] = false;
+    }
+
+    // Use this for initialization
+    void Start ()
+    {
+        collectibles = new bool[5];
+        dt = Time.deltaTime;
+
+        Init();
 
         currentState = GameState.PLAY;
     }
@@ -122,7 +128,8 @@ public class Game : MonoBehaviour
 
     public void Restart()
     {
-        paused = false;
+        Init();
+
         currentState = GameState.PLAY;
     }
 
