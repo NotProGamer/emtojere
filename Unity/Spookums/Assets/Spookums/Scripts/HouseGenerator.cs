@@ -26,17 +26,17 @@ public class HouseGenerator : MonoBehaviour {
 	
 	void CreateFloor(int rooms, Vector2 leftBound, Vector2 rightBound){
 		// Make sure rooms are behind the player and objects
-		float zRoom = 3f;
+		float zRoom = 4.5f;
 
 		// Calculate average width of rooms
 		float wRoom = (rightBound.x - leftBound.x)/rooms;
-
 		float xRoom = leftBound.x + wRoom/2;
 		float yRoom = leftBound.y;
 
 		for (int i = 0; i < rooms; i++) {
-			GameObject instance = (GameObject)Instantiate (room, new Vector3 (xRoom, yRoom, zRoom), Quaternion.identity);
-			instance.transform.localScale = new Vector3 (1f, 1f, 1f);
+			GameObject instance = (GameObject)Instantiate (room);
+			instance.transform.position = new Vector3 (xRoom, yRoom, zRoom);
+			instance.transform.localScale = new Vector3 (1f, 0.95f, 1f);
 			instance.transform.SetParent (transform);
 			instance.GetComponentInChildren<MeshRenderer> ().material = wallpapers [Random.Range (0, wallpapers.Length)];
 			xRoom += wRoom;
