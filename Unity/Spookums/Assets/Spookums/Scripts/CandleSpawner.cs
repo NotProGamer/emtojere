@@ -18,6 +18,7 @@ public class CandleSpawner : MonoBehaviour {
 		for (int i = 0; i < numCandles; i++) {
 			GameObject instance = (GameObject)Instantiate (candle);
 			instance.transform.position = new Vector3 (transform.position.x + Random.Range (xMin, xMax), transform.position.y + yCandle, transform.position.z);
+			instance.transform.rotation = Quaternion.Euler (0f, Mathf.RoundToInt (Random.Range (0f, 1f)) * 180f, 0f);
 			instance.transform.SetParent (transform);
 			instance.transform.localScale = scale;
 		}

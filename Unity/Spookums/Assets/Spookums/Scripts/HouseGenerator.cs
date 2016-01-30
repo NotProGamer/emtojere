@@ -6,6 +6,8 @@ public class HouseGenerator : MonoBehaviour {
 
 	public GameObject room;
 	public GameObject door;
+	public GameObject stairUp;
+	public GameObject stairDown;
 	public Material[] wallpapers;
 	public Material[] basementWallpapers;
 	public Material[] atticWallpapers;
@@ -19,36 +21,63 @@ public class HouseGenerator : MonoBehaviour {
 	private Vector2[] atticBounds = new Vector2[2]{new Vector2(-2.15f,2.7f), new Vector2(1.85f,2.7f)};
 	private int j;
 	private List<GameObject> collectibleRandomiser;
-	private List<GameObject> randomiser;
+	private List<GameObject> interactibleRandomiser;
+	private List<GameObject> collAndStairs = new List<GameObject>();
+	[SerializeField]private List<GameObject> downStairs = new List<GameObject>();
+	[SerializeField]private List<GameObject> upStairs = new List<GameObject>();
 
 	// Use this for initialization
 	void Start () {
 
 		// We want an interactible in every room
-		randomiser = new List<GameObject>();
-		randomiser.AddRange (interactibles);
+		interactibleRandomiser = new List<GameObject>();
+		interactibleRandomiser.AddRange (interactibles);
 
-		// We want the collectibles to not be in the attic
-		int roomCount = numberFloors [0] + numberFloors [1] + numberFloors [2];
 		collectibleRandomiser = new List<GameObject> ();
 		collectibleRandomiser.AddRange (collectibles);
-		// We add some null dummy entries to the list so that random rooms will get a collectible
-		for (int i = collectibles.Length; i < roomCount; i++) {
-			collectibleRandomiser.Add (null);
-		}
 
 		j = Random.Range(0, wallpapers.Length);
 
 		// Generate Basement;
+		CollectiblesAndStairs(true, false, numberFloors[0]);
 		CreateFloor(numberFloors[0], basementBounds[0], basementBounds[1], basementWallpapers);
 		// Generate Ground floor;
+		CollectiblesAndStairs(true, true, numberFloors[1]);
 		CreateFloor(numberFloors[1], groundBounds[0], groundBounds[1], wallpapers);
 		// Generate First floor;
+		CollectiblesAndStairs(false, true, numberFloors[2]);
 		CreateFloor(numberFloors[2], firstBounds[0], firstBounds[1], wallpapers);
 		// Generate Attic;
+		CollectiblesAndStairs(false, false, 0);
 		CreateFloor(numberFloors[3], atticBounds[0], atticBounds[1], atticWallpapers);
+
+		// Link up the stairs
+		downStairs[0].GetComponent<Stairs>().destination = upStairs[0].transform;
+		upStairs[0].GetComponent<Stairs>().destination = downStairs[0].transform;
+		downStairs[1].GetComponent<Stairs>().destination = upStairs[1].transform;
+		upStairs[1].GetComponent<Stairs>().destination = downStairs[1].transform;
 	}
-		
+
+	void CollectiblesAndStairs(bool up, bool down, int rooms){
+		collAndStairs.Clear();
+		if (up){
+			collAndStairs.Add (stairUp);
+		}
+		if (down)
+			collAndStairs.Add (stairDown);
+
+		int remaining = rooms - collAndStairs.Count;
+
+		if (remaining > 0) {
+			for (int i = 0; i < remaining; i++) {
+				if (collectibleRandomiser.Count > 0) {
+					int j = Random.Range (0, collectibleRandomiser.Count);
+					collAndStairs.Add (collectibleRandomiser [j]);
+					collectibleRandomiser.RemoveAt (j);
+				}
+			}
+		}
+	}
 	
 	void CreateFloor(int rooms, Vector2 leftBound, Vector2 rightBound, Material[] wallArray){
 		// Make sure rooms are behind the player and objects
@@ -61,7 +90,7 @@ public class HouseGenerator : MonoBehaviour {
 		xScale[rooms-1] = rooms;
 
 		for (int i = 0; i < rooms-1; i++) {
-			xScale[i] = 1f + Random.Range (-0.3f, 0.3f);
+			xScale[i] = 1f + Random.Range (-0.15f, 0.15f);
 			xScale[rooms-1] -=xScale[i];
 		}
 
@@ -76,23 +105,33 @@ public class HouseGenerator : MonoBehaviour {
 			instance.transform.SetParent (transform);
 			instance.GetComponentInChildren<MeshRenderer> ().material = wallArray [Random.Range (j, wallArray.Length)];
 
-			// We need to refill the interactibles list if we've exhausted it, and then grab one at random
-			if (randomiser.Count == 0) {
-				randomiser.AddRange (interactibles);
+			if (interactibleRandomiser.Count == 0) {
+				interactibleRandomiser.AddRange (interactibles);
 			}
-			int r = Random.Range (0, randomiser.Count);
-			GameObject obj = Instantiate (randomiser [r]);
-			obj.transform.position = instance.transform.position - new Vector3(0f, 1.15f, 1.5f);
-			randomiser.RemoveAt (r);
+			int r = Random.Range (0, interactibleRandomiser.Count);
+			GameObject obj = Instantiate (interactibleRandomiser [r]);
+			// Interactibles should go on the left side of the room except for the final room on each floor
+			float offset = 1.1f - wRoom * xScale [i] / 2;
+
+			if (i == rooms - 1)
+				offset = -offset;
+
+			obj.transform.position = instance.transform.position + new Vector3(offset, -1.15f, -1.5f);
+			interactibleRandomiser.RemoveAt (r);
 
 			// Checking if the collectible list still has entries just for safety - we don't really care if we exhaust it.
-			if (collectibleRandomiser.Count > 0) {
-				r = Random.Range (0, collectibleRandomiser.Count);
-				if (collectibleRandomiser [r] != null) {
-					obj = Instantiate (collectibleRandomiser [r]);
-					obj.transform.position = instance.transform.position - new Vector3(0f, 1.15f, 4.5f);
+			if (collAndStairs.Count > 0) {
+				r = Random.Range (0, collAndStairs.Count);
+				if (collAndStairs [r] != null) {
+					obj = Instantiate (collAndStairs [r]);
+					// Collectibles should go on the right side except the final room
+					obj.transform.position = instance.transform.position + new Vector3(-offset, -1.02f, -3.5f);
+					if (obj.name == "StairDown(Clone)")
+						downStairs.Add (obj);
+					if (obj.name == "StairUp(Clone)")
+						upStairs.Add (obj);
 				}
-				collectibleRandomiser.RemoveAt (r);
+				collAndStairs.RemoveAt (r);
 			}
 
 			// Add a door to the next room!
