@@ -60,8 +60,7 @@ public class Stairs : MonoBehaviour {
                 {
                     //if target and destination are on the same level but not this level then teleport
 
-                    Debug.Log(GetDirection(npcScript.GetTarget()) == GetDirection(destination.position)
-                        && GetDirection(npcScript.GetTarget()) != LureDirection.Across ? "true" :"false");
+                    //Debug.Log(GetDirection(npcScript.GetTarget()) == GetDirection(destination.position) && GetDirection(npcScript.GetTarget()) != LureDirection.Across ? "true" :"false");
 
                     if (GetDirection(npcScript.GetTarget()) == GetDirection(destination.position)
                         && GetDirection(npcScript.GetTarget()) != LureDirection.Across)
@@ -71,13 +70,14 @@ public class Stairs : MonoBehaviour {
                     }
                     else
                     {
-                        Debug.Log("xyz");
+                        //Debug.Log("xyz");
                     }
                 }
                 else
                 {
                     if (Random.value >= teleportChance)
                     {
+                        //other.transform.position = transform.position; // go to stairs
                         npcScript.Teleport(destination.position);
                         destination.gameObject.GetComponent<Stairs>().SetTimer(2f);
                     }

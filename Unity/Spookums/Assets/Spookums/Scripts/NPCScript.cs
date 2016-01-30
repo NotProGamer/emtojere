@@ -33,6 +33,11 @@ public class NPCScript : MonoBehaviour {
     public float reactionDelay = 2f;
     private float m_reactionTimer = 0f;
 
+    public float m_travelDelay = 2f;
+    private float m_travelTimer = 0f;
+    private bool m_teleport = true;
+
+
     public bool IsLured()
     {
         return m_lured;
@@ -57,7 +62,7 @@ public class NPCScript : MonoBehaviour {
         if (Input.GetMouseButtonDown(0))
         {
             SetDirection(Camera.main.ScreenToWorldPoint(Input.mousePosition), true);
-            Debug.Log(Camera.main.ScreenToWorldPoint(Input.mousePosition).ToString());
+            //Debug.Log(Camera.main.ScreenToWorldPoint(Input.mousePosition).ToString());
         }
 
         if (m_reactionTimer > 0)
@@ -69,12 +74,43 @@ public class NPCScript : MonoBehaviour {
             m_reactionTimer = 0;
         }
 
+        
+        if (m_travelTimer > 0)
+        {
+            m_travelTimer -= Time.deltaTime;
+
+            if (m_travelTimer / m_travelDelay > 0.5f)
+            {
+                m_travelTimer / m_travelDelay - (m_travelDelay / 2);
+
+                // fade out
+
+
+
+            }
+            else
+            {
+                if (m_teleport)
+                {
+                    transform.position = m_teleportDestination;
+                    m_teleport = false;
+                }
+                // fade in
+            }
+
+
+        }
+        else if (m_travelTimer < 0)
+        {
+            m_travelTimer = 0;
+            m_target = m_teleportDestination;
+        }
 
     }
 
     public void SetDirection(Vector3 source, bool lure)
     {
-        if (m_paused) return;
+        if (m_paused || m_travelTimer < 0 ) return;
 
         m_reactionTimer = reactionDelay;
 
@@ -100,6 +136,8 @@ public class NPCScript : MonoBehaviour {
         }
         m_lured = lure;
     }
+
+
 
     public Vector3 GetTarget()
     {
@@ -132,7 +170,7 @@ public class NPCScript : MonoBehaviour {
             {
                 Flip();
             }
-
+            
             if (m_reactionTimer == 0)
             {
                 m_rigidbody.velocity = new Vector2(movement * maxSpeed, m_rigidbody.velocity.y);
@@ -159,18 +197,27 @@ public class NPCScript : MonoBehaviour {
         transform.localScale = theScale;
     }
 
-    
+    private Vector3 m_teleportDestination;
 
-    public void Teleport(Vector3 destination)
+    public void Teleport(Vector3 teleportExit, Vector3 teleportEntry)
     {
         if (m_paused) return;
 
-        m_target = transform.position;
+        m_teleportDestination = teleportExit;
 
+        m_travelTimer = m_travelDelay;
+        m_teleport = true;
 
-        transform.position = destination;
+        transform.position = m_teleportDestination;
+
+        //transform.position = destination;
         //m_rigidbody.velocity = Vector2.zero;
-        
+
+
+
+
+        // Stop
+        m_target = transform.position;
     }
 
     void OnPause()
