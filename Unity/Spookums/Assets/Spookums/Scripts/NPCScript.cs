@@ -3,6 +3,8 @@ using System.Collections;
 
 public class NPCScript : MonoBehaviour {
 
+	public SpriteRenderer sprite;
+
     private bool m_paused;
     private Vector3 m_playVelocity;
 
