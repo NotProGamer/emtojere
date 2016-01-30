@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+<<<<<<< HEAD
 public class NPCScript : MonoBehaviour {
 
 	public SpriteRenderer sprite;
+=======
+public class NPCScript : MonoBehaviour
+{
+>>>>>>> 23c586ecfa46fc65fb399703894589ddc706dfbb
     private bool m_paused;
     private Vector3 m_playVelocity;
 
     public float maxSpeed = 10f;
     private bool m_facingRight = true;
+    int currentFloor;
 
     private bool m_lured = true;
     private Vector3 m_target;
@@ -31,6 +37,11 @@ public class NPCScript : MonoBehaviour {
     bool fadingUp;
     Vector3 m_destination;
 
+    // source-seeking data
+    Vector3 alertLocation;
+    int alertFloor;
+    ArrayList stairs;
+
     public float GetFearRating()
     {
         return currentFearRating / maxFearRating;
@@ -51,16 +62,31 @@ public class NPCScript : MonoBehaviour {
         m_target = transform.position;
         m_destination = transform.position;
         m_rigidbody = GetComponent<Rigidbody2D>();
+        m_rigidbody.velocity = Vector3.zero;
         //m_anim = GetComponent<Animator>();
         currentFearRating = 0f;
         fadeTimer = fadeTime;
         fadingDown = false;
         fadingUp = false;
+        currentFloor = 0;
+        m_lured = false;
+
+        // populate stairs list
+        Object[] objects = FindObjectsOfType(typeof(GameObject));
+        stairs = new ArrayList();
+
+        foreach (GameObject o in objects)
+        {
+            if (o.name.Contains("Stair"))
+                stairs.Add(o);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (m_paused) return;
+
         if (fadingDown)
         {
             fadeTimer -= Time.deltaTime;
@@ -76,8 +102,15 @@ public class NPCScript : MonoBehaviour {
                 fadeTimer = 0.0f;
                 fadingDown = false;
                 fadingUp = true;
+<<<<<<< HEAD
 				m_destination.z -= 1;
 				transform.position = m_destination;
+=======
+                transform.position = m_destination;
+
+                // we've arrived at our destination. Clear target in order to select a new one.
+                m_target = Vector3.zero;
+>>>>>>> 23c586ecfa46fc65fb399703894589ddc706dfbb
             }
 
             return;
@@ -99,23 +132,13 @@ public class NPCScript : MonoBehaviour {
                 UnFreezeVelocity();
             }
 
-            SetDirection(m_target, IsLured(), false);
-
             return;
         }
 
-        if (m_paused) return;
-
-        // DEBUG: MANUAL TELEPORT -- REMOVE BEFORE PUBLISH
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            Teleport(m_target);
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            SetDirection(Camera.main.ScreenToWorldPoint(Input.mousePosition), true);
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    SetDirection(Camera.main.ScreenToWorldPoint(Input.mousePosition), true);
+        //}
 
         if (m_reactionTimer > 0)
         {
@@ -127,7 +150,7 @@ public class NPCScript : MonoBehaviour {
         }
     }
 
-    public void SetDirection(Vector3 source, bool lure, bool useDelay = true)
+    public void Alert(Vector3 source, bool lure, int floor, bool useDelay = true)
     {
         if (m_paused || fadingDown || fadingUp) return;
 
@@ -136,9 +159,31 @@ public class NPCScript : MonoBehaviour {
         else
             m_reactionTimer = 0.0f;
 
-        m_target = source;
-        m_target.z = transform.position.z;
+        alertLocation = source;
+
+        if (lure)
+        {
+            alertFloor = floor;
+            m_lured = true;
+        }
+    }
+
+    public int GetAlertFloor()
+    {
+        return alertFloor;
+    }
+
+    public int GetCurrentFloor()
+    {
+        return currentFloor;
+    }
+
+    public void SetDirection()
+    {
+        if (m_paused || fadingDown || fadingUp) return;
+
         float horizontalDirection = transform.position.x - m_target.x;
+
         if (horizontalDirection > 0)
         {
             hDir = 1f;
@@ -148,7 +193,7 @@ public class NPCScript : MonoBehaviour {
             hDir = -1f;
         }
 
-        if (lure)
+        if (m_lured)
         {
             hDir *= -1;
         }
@@ -156,7 +201,6 @@ public class NPCScript : MonoBehaviour {
         {
             currentFearRating += scareRating;
         }
-        m_lured = lure;
     }
 
     public Vector3 GetTarget()
@@ -173,39 +217,95 @@ public class NPCScript : MonoBehaviour {
         // set grounded animation
         //anim.SetBool("Grounded", m_grounded);
 
-        if (m_grounded)
+        //if (m_grounded)
         {
+            // if we are currently being lured, navigate to the source
+            if (m_lured && m_target == Vector3.zero)
+            {
+                switch (alertFloor - currentFloor)
+                {
+                    case -3:
+                    case -2:
+                    case -1:
+                        // below us. Find stairs on our floor that go down and target them
+                        foreach (GameObject s in stairs)
+                        {
+                            Stairs stair = s.GetComponent<Stairs>();
 
-            // movement
-            //float movement = Input.GetAxis("Horizontal");
-            float movement = hDir;
+                            if (stair.GetFloor() == currentFloor && stair.GetDestinationFloor() < currentFloor)
+                            {
+                                m_target = s.transform.position;
+                                break;
+                            }
+                        }
 
-            // flip animation
-            if (movement > 0 && !m_facingRight)
-            {
-                Flip();
-            }
-            else if (movement < 0 && m_facingRight)
-            {
-                Flip();
+                        break;
+                    case 0:
+                        // we're on the same floor. Set target directly
+                        m_target = alertLocation;
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                        // above us. Find stairs on our floor that go up and target them
+                        foreach (GameObject s in stairs)
+                        {
+                            Stairs stair = s.GetComponent<Stairs>();
+
+                            if (stair.GetFloor() == currentFloor && stair.GetDestinationFloor() > currentFloor)
+                            {
+                                m_target = s.transform.position;
+                                break;
+                            }
+                        }
+
+                        break;
+                }
             }
 
-            if (m_reactionTimer == 0)
+            if (m_lured)
             {
-                m_rigidbody.velocity = new Vector2(movement * maxSpeed, m_rigidbody.velocity.y);
-                // set speed animation 
-                //anim.SetFloat("Speed", Mathf.Abs(movement)); // horizontal speed
-                //anim.SetFloat("vSpeed", m_rigidbody.velocity.y); // vertical speed
-            }
-            else
-            {
-                m_rigidbody.velocity = Vector2.zero;
-            }
+                SetDirection();
 
-            if (transform.position.x - m_target.x < 1.0f && transform.position.y - m_target.y < 1.0f)
-            {
-                m_target = transform.position;
-                m_rigidbody.velocity = Vector3.zero;
+                // movement
+                //float movement = Input.GetAxis("Horizontal");
+                float movement = hDir;
+
+                // flip animation
+                if (movement > 0 && !m_facingRight)
+                {
+                    Flip();
+                }
+                else if (movement < 0 && m_facingRight)
+                {
+                    Flip();
+                }
+
+                if (m_reactionTimer == 0)
+                {
+                    m_rigidbody.velocity = new Vector2(movement * maxSpeed, m_rigidbody.velocity.y);
+                    // set speed animation 
+                    //anim.SetFloat("Speed", Mathf.Abs(movement)); // horizontal speed
+                    //anim.SetFloat("vSpeed", m_rigidbody.velocity.y); // vertical speed
+                }
+                else
+                {
+                    m_rigidbody.velocity = Vector2.zero;
+                }
+
+                float dx = Mathf.Abs(transform.position.x - m_target.x);
+                float dy = Mathf.Abs(transform.position.y - m_target.y);
+
+                if (dx < 1.0f && dy < 1.0f)
+                {
+                    if (m_target == alertLocation)
+                    {
+                        if (m_lured) m_lured = false; // we've reached the source of our alert, return to neutral disposition
+                    }
+
+                    m_target = Vector3.zero;
+                    m_rigidbody.velocity = Vector3.zero;
+                }
             }
         }
     }
@@ -221,20 +321,17 @@ public class NPCScript : MonoBehaviour {
         transform.localScale = theScale;
     }
 
-    public void Teleport(Vector3 destination, bool doFade = true)
+    public void Teleport(Vector3 destination, int newFloor)
     {
         if (m_paused) return;
 
-        if (doFade)
+        //if (doFade)
         {
+            currentFloor = newFloor;
             fadeTimer = fadeTime;
             fadingDown = true;
             m_destination = destination;
             FreezeVelocity();
-        }
-        else
-        {
-            transform.position = destination;
         }
     }
 
