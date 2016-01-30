@@ -10,6 +10,8 @@ public class Stairs : MonoBehaviour {
     public float teleportTimer = 0f;
     public float teleportChance = 0.5f;
 
+    public float levelDistance = 0.1f;
+
     // Use this for initialization
     void Start()
     {
@@ -42,6 +44,7 @@ public class Stairs : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("Collision");
         if (m_paused) return;
 
         if (other.gameObject.tag == "NPC")
@@ -56,12 +59,20 @@ public class Stairs : MonoBehaviour {
                 if (npcScript.IsLured())
                 {
                     //if target and destination are on the same level but not this level then teleport
+
+                    Debug.Log(GetDirection(npcScript.GetTarget()) == GetDirection(destination.position)
+                        && GetDirection(npcScript.GetTarget()) != LureDirection.Across ? "true" :"false");
+
                     if (GetDirection(npcScript.GetTarget()) == GetDirection(destination.position)
                         && GetDirection(npcScript.GetTarget()) != LureDirection.Across)
                     {
                         npcScript.SetStairsLocation(transform.position);
                         npcScript.Teleport(destination.position);
                         destination.gameObject.GetComponent<Stairs>().SetTimer(2f);
+                    }
+                    else
+                    {
+                        Debug.Log("xyz");
                     }
                 }
                 else
@@ -83,11 +94,11 @@ public class Stairs : MonoBehaviour {
 
     LureDirection GetDirection(Vector3 target)
     {
-        if (target.y - transform.position.y >= 2)
+        if (target.y - transform.position.y >= levelDistance)
         {
             return LureDirection.Up;
         }
-        else if (target.y - transform.position.y >= -2)
+        else if (target.y - transform.position.y <= -levelDistance)
         {
             return LureDirection.Down;
         }

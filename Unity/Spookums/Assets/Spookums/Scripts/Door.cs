@@ -8,11 +8,11 @@ public class Door : ClickBase {
         Debug.Log("Hit");
         if (other.transform.position.x < transform.position.x)
         {
-            animator.SetTrigger("OpenLeft");
+            animator.SetTrigger("OpenRight");
             audioSources[1].Play();
         }
         else {
-            animator.SetTrigger("OpenRight");
+            animator.SetTrigger("OpenLeft");
             audioSources[1].Play();
         }
     }

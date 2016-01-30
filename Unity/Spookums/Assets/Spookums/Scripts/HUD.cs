@@ -16,7 +16,7 @@ public class HUD : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        timeMeter.GetComponent<Slider>().value = (360 - game.GetTimer()) / 360;
+        timeMeter.GetComponent<Slider>().value = (game.maxTimer - game.GetTimer()) / game.maxTimer;
 //        fearMeter.GetComponent<Slider>().value = npc.GetFear();
         foreach(GameObject c in collectibles)
         {
