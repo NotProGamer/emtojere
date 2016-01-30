@@ -5,6 +5,7 @@ public class PauseController : MonoBehaviour
 {
     bool paused = false;
     public Game game;
+    public Texture2D texture;
 
     // Use this for initialization
     void Start ()
@@ -22,11 +23,11 @@ public class PauseController : MonoBehaviour
     {
         if (paused && !game.IsShowingMenu())
         {
-            int menuWidth = 100;
-            int menuHeight = 120;
+            int menuWidth = 300;
+            int menuHeight = 150;
 
             // Make a background box
-            GUI.Box(new Rect((Screen.width - menuWidth)/2, (Screen.height - menuHeight)/2, menuWidth, menuHeight), "PAUSED");
+            GUI.Box(new Rect((Screen.width - menuWidth)/2, (Screen.height - menuHeight)/2, menuWidth, menuHeight), texture);
 
             // Resume
             if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10, ((Screen.height - menuHeight) / 2) + (1*30), 80, 20), "Resume"))
