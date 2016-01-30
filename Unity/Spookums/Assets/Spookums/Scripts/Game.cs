@@ -3,10 +3,19 @@ using System.Collections;
 
 public class Game : MonoBehaviour
 {
+    enum GameState
+    {
+        WIN = 0,
+        LOSE,
+        PAUSE,
+        PLAY
+    };
+
     [SerializeField]private float timer = 300;
     float dt;
     bool isPaused;
     bool[] collectibles;
+    int currentState;
 
     // Use this for initialization
     void Start ()
@@ -17,6 +26,8 @@ public class Game : MonoBehaviour
 
         for (int i = 0; i < collectibles.Length; i++)
             collectibles[i] = false;
+
+        //currentState = GameState.PLAY;
     }
 
     // Update is called once per frame
