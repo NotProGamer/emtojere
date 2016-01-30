@@ -60,21 +60,13 @@ public class Stairs : MonoBehaviour
                 // if npc is lured
                 if (npcScript.IsLured())
                 {
-                    if (npcScript.GetAlertFloor() == GetDestinationFloor())
+					int df =  Mathf.Abs(npcScript.GetAlertFloor() - npcScript.GetCurrentFloor());
+                    int ndf = Mathf.Abs(npcScript.GetAlertFloor() - GetDestinationFloor());
+					
+                    if (npcScript.GetAlertFloor() == GetDestinationFloor() ||
+                         ndf < df)
                     {
                         npcScript.Teleport(destination.position, GetDestinationFloor());
-                    }
-                }
-                else
-                {
-                    if (Random.value >= teleportChance)
-                    {
-                        npcScript.Teleport(destination.position, GetDestinationFloor());
-                        //destination.gameObject.GetComponent<Stairs>().SetTimer(5f);
-                    }
-                    else
-                    {
-                        // keep moving
                     }
                 }
             }
