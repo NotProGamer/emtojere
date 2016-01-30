@@ -20,7 +20,7 @@ public class PauseController : MonoBehaviour
 
     void OnGUI()
     {
-        if (paused)
+        if (paused && !game.IsShowingMenu())
         {
             int menuWidth = 100;
             int menuHeight = 120;
