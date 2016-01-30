@@ -98,7 +98,7 @@ public class NPCScript : MonoBehaviour
                 UnFreezeVelocity();
             }
 
-            SetDirection(m_target, IsLured());
+            SetDirection(m_target, IsLured(), false);
 
             return;
         }
@@ -126,11 +126,14 @@ public class NPCScript : MonoBehaviour
         }
     }
 
-    public void SetDirection(Vector3 source, bool lure)
+    public void SetDirection(Vector3 source, bool lure, bool useDelay = true)
     {
         if (m_paused || fadingDown || fadingUp) return;
 
-        m_reactionTimer = reactionDelay;
+        if (useDelay)
+            m_reactionTimer = reactionDelay;
+        else
+            m_reactionTimer = 0.0f;
 
         m_target = source;
         m_target.z = transform.position.z;
