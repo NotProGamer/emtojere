@@ -38,6 +38,7 @@ public class NPCScript : MonoBehaviour {
         return m_lured;
     }
 
+    public Vector2 m_Velocity;
 
     // Use this for initialization
     void Start()
@@ -56,6 +57,7 @@ public class NPCScript : MonoBehaviour {
         if (Input.GetMouseButtonDown(0))
         {
             SetDirection(Camera.main.ScreenToWorldPoint(Input.mousePosition), true);
+            Debug.Log(Camera.main.ScreenToWorldPoint(Input.mousePosition).ToString());
         }
 
         if (m_reactionTimer > 0)
@@ -106,6 +108,7 @@ public class NPCScript : MonoBehaviour {
 
     void FixedUpdate()
     {
+        m_Velocity = m_rigidbody.velocity;
         if (m_paused) return;
 
         m_grounded = Physics2D.OverlapCircle(m_groundCheck.position, m_groundRadius, whatIsGround);
@@ -162,7 +165,12 @@ public class NPCScript : MonoBehaviour {
     {
         if (m_paused) return;
 
+        m_target = transform.position;
+
+
         transform.position = destination;
+        //m_rigidbody.velocity = Vector2.zero;
+        
     }
 
     void OnPause()
