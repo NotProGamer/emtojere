@@ -27,12 +27,6 @@ public class Game : MonoBehaviour
 
         for (int i = 0; i < collectibles.Length; i++)
             collectibles[i] = false;
-<<<<<<< HEAD
-=======
-
-        // place NPC at start position
-        //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0), false);
->>>>>>> 23c586ecfa46fc65fb399703894589ddc706dfbb
     }
 
     // Use this for initialization
