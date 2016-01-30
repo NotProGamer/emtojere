@@ -9,9 +9,11 @@ public class Door : ClickBase {
         if (other.transform.position.x < transform.position.x)
         {
             animator.SetTrigger("OpenLeft");
+            audioSources[1].Play();
         }
         else {
             animator.SetTrigger("OpenRight");
+            audioSources[1].Play();
         }
     }
 
