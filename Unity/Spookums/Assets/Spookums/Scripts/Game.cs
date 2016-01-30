@@ -5,29 +5,31 @@ public class Game : MonoBehaviour
 {
     enum GameState
     {
-        WIN = 0,
+        WIN,
         LOSE,
         PAUSE,
         PLAY
     };
 
-    [SerializeField]private float timer = 300;
+    public float maxTimer = 360;
+    float timer;
     float dt;
-    bool isPaused;
+    bool paused;
     bool[] collectibles;
-    int currentState;
+    GameState currentState;
 
     // Use this for initialization
     void Start ()
     {
+        paused = false;
+        timer = maxTimer;
         dt = Time.deltaTime;
-        isPaused = false;
         collectibles = new bool[5];
 
         for (int i = 0; i < collectibles.Length; i++)
             collectibles[i] = false;
 
-        //currentState = GameState.PLAY;
+        currentState = GameState.PLAY;
     }
 
     // Update is called once per frame
@@ -36,7 +38,7 @@ public class Game : MonoBehaviour
         // update delta time
         dt = Time.deltaTime;
 
-        if (!isPaused)
+        if (!paused)
         {
             timer -= dt;
 
@@ -50,6 +52,26 @@ public class Game : MonoBehaviour
                 // unlock attic
             }
         }
+
+        // handle inputs
+        // ESC : Pause Game or Resume Game
+        if (Input.GetKeyDown(KeyCode.Escape) && !paused)
+        {
+            // tell all gameobjects to pause
+            Object[] objects = FindObjectsOfType(typeof(GameObject));
+
+            foreach (GameObject g in objects)
+            {
+                g.SendMessage("OnPause", SendMessageOptions.DontRequireReceiver);
+            }
+
+            paused = true;
+            currentState = GameState.PAUSE;
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) && paused)
+        {
+            UnPause();
+        }
     }
 
     bool EverythingCollected()
@@ -60,7 +82,7 @@ public class Game : MonoBehaviour
                 return false;
         }
 
-        return true;
+        return false;
     }
 
     public string GetTimeAsString()
@@ -82,5 +104,31 @@ public class Game : MonoBehaviour
     public float GetTimer()
     {
         return timer;
+    }
+
+    public void UnPause()
+    {
+        // tell all gameobjects to resume
+        Object[] objects = FindObjectsOfType(typeof(GameObject));
+
+        foreach (GameObject g in objects)
+        {
+            g.SendMessage("OnResume", SendMessageOptions.DontRequireReceiver);
+        }
+
+        paused = false;
+        currentState = GameState.PLAY;
+    }
+
+    public void Restart()
+    {
+        paused = false;
+        currentState = GameState.PLAY;
+    }
+
+    public void Quit()
+    {
+        paused = false;
+        Application.Quit();
     }
 }
