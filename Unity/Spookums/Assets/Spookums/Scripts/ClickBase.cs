@@ -12,6 +12,7 @@ public abstract class ClickBase : MonoBehaviour
     protected AudioSource[] audioSources;
     protected Animator animator;
 	protected Slider fearMeter;
+	protected bool clickable = true;
 
     public bool isHouseExit = false;
 
@@ -39,7 +40,7 @@ public abstract class ClickBase : MonoBehaviour
     {
         if (isHouseExit || npc.IsFleeing()) return;
 
-        if (Time.time > clickTime)
+		if ((Time.time > clickTime) && clickable)
         {
             //Trigger animation and audio here
             animator.SetTrigger("Click");
@@ -64,6 +65,7 @@ public abstract class ClickBase : MonoBehaviour
                 npc.EvacuateHouse();
                 npc.Alert(GameObject.Find("HouseExit").transform.position, true, 0, false);
             }
+			Clicked ();
         }
     }
 
@@ -80,4 +82,7 @@ public abstract class ClickBase : MonoBehaviour
 
         animator.SetBool("MouseOver", false);
     }
+
+	protected virtual void Clicked(){
+	}
 }
