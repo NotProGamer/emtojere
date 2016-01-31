@@ -10,7 +10,12 @@ public class NPCScript : MonoBehaviour
     private bool m_facingRight = true;
     int currentFloor;
 
-    private bool m_lured = true;
+    private bool m_lured;
+    private bool m_scared;
+    private bool m_cornered;
+    float fearImmunityTimer;
+    public float fearImmunityMax = 2.0f;
+
     private Vector3 m_target;
     private float hDir = 0f;
 
@@ -50,6 +55,10 @@ public class NPCScript : MonoBehaviour
         return m_lured;
     }
 
+    public bool IsScared()
+    {
+        return m_scared;
+    }
 
     // Use this for initialization
     void Start()
@@ -65,6 +74,9 @@ public class NPCScript : MonoBehaviour
         fadingUp = false;
         currentFloor = 0;
         m_lured = false;
+        m_scared = false;
+        m_cornered = false;
+        fearImmunityTimer = 0.0f;
 
         // populate stairs list
         Object[] objects = FindObjectsOfType(typeof(GameObject));
@@ -97,7 +109,7 @@ public class NPCScript : MonoBehaviour
                 fadeTimer = 0.0f;
                 fadingDown = false;
                 fadingUp = true;
-                transform.position = m_destination;
+                transform.position = new Vector3(m_destination.x, m_destination.y, transform.position.z);
 
                 // we've arrived at our destination. Clear target in order to select a new one.
                 m_target = Vector3.zero;
@@ -138,11 +150,20 @@ public class NPCScript : MonoBehaviour
         {
             m_reactionTimer = 0;
         }
+
+        if (fearImmunityTimer > 0)
+        {
+            fearImmunityTimer -= Time.deltaTime;
+        }
+        else if (fearImmunityTimer < 0)
+        {
+            fearImmunityTimer = 0.0f;
+        }
     }
 
     public void Alert(Vector3 source, bool lure, int floor, bool useDelay = true)
     {
-        if (m_paused || fadingDown || fadingUp) return;
+        if (m_paused || fadingDown || fadingUp || m_scared || fearImmunityTimer > 0) return;
 
         if (useDelay)
             m_reactionTimer = reactionDelay;
@@ -150,11 +171,17 @@ public class NPCScript : MonoBehaviour
             m_reactionTimer = 0.0f;
 
         alertLocation = source;
+        alertFloor = floor;
 
-        if (lure)
+        if (lure || m_cornered) m_lured = true;
+        else m_scared = true;
+
+        if (m_cornered)
         {
-            alertFloor = floor;
-            m_lured = true;
+            // fear immunity timer stops us from fleeing to corner immediately after leaving it.
+            fearImmunityTimer = fearImmunityMax;
+            //m_cornered = false;
+            //m_target = Vector3.zero; // clear target so it can be calculated correctly during navigation
         }
     }
 
@@ -172,7 +199,10 @@ public class NPCScript : MonoBehaviour
     {
         if (m_paused || fadingDown || fadingUp) return;
 
-        float horizontalDirection = transform.position.x - m_target.x;
+        float horizontalDirection = 0.0f;
+
+        if (m_lured)        horizontalDirection = transform.position.x - m_target.x;
+        else if (m_scared)  horizontalDirection = transform.position.x - alertLocation.x;
 
         if (horizontalDirection > 0)
         {
@@ -202,7 +232,7 @@ public class NPCScript : MonoBehaviour
     {
         if (m_paused || fadingDown || fadingUp) return;
 
-        m_grounded = Physics2D.OverlapCircle(m_groundCheck.position, m_groundRadius, whatIsGround);
+        //m_grounded = Physics2D.OverlapCircle(m_groundCheck.position, m_groundRadius, whatIsGround);
 
         // set grounded animation
         //anim.SetBool("Grounded", m_grounded);
@@ -253,7 +283,7 @@ public class NPCScript : MonoBehaviour
                 }
             }
 
-            if (m_lured)
+            if (m_lured || m_scared)
             {
                 SetDirection();
 
@@ -273,7 +303,8 @@ public class NPCScript : MonoBehaviour
 
                 if (m_reactionTimer == 0)
                 {
-                    m_rigidbody.velocity = new Vector2(movement * maxSpeed, m_rigidbody.velocity.y);
+                    float speedFactor = m_lured ? 0.5f : 1.0f;
+                    m_rigidbody.velocity = new Vector2(movement * (maxSpeed * speedFactor), m_rigidbody.velocity.y);
                     // set speed animation 
                     //anim.SetFloat("Speed", Mathf.Abs(movement)); // horizontal speed
                     //anim.SetFloat("vSpeed", m_rigidbody.velocity.y); // vertical speed
@@ -283,20 +314,40 @@ public class NPCScript : MonoBehaviour
                     m_rigidbody.velocity = Vector2.zero;
                 }
 
-                float dx = Mathf.Abs(transform.position.x - m_target.x);
-                float dy = Mathf.Abs(transform.position.y - m_target.y);
-
-                if (dx < 1.0f && dy < 1.0f)
+                if (m_lured)
                 {
-                    if (m_target == alertLocation)
-                    {
-                        if (m_lured) m_lured = false; // we've reached the source of our alert, return to neutral disposition
-                    }
+                    float dx = Mathf.Abs(transform.position.x - m_target.x);
+                    float dy = Mathf.Abs(transform.position.y - m_target.y);
 
-                    m_target = Vector3.zero;
-                    m_rigidbody.velocity = Vector3.zero;
+                    if (dx < 1.0f && dy < 1.0f)
+                    {
+                        if (m_target == alertLocation)
+                        {
+                            if (m_lured) m_lured = false; // we've reached the source of our alert, return to neutral disposition
+                        }
+
+                        m_target = Vector3.zero;
+                        m_rigidbody.velocity = Vector3.zero;
+                    }
                 }
             }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (m_paused) return;
+
+            Debug.Log("NPC collided with " + other.gameObject.name + ".");
+        if (other.gameObject.name.Contains("Wall") && m_scared)
+        {
+
+            // turn around and quail in terror
+            Flip();
+            m_rigidbody.velocity = Vector3.zero;
+
+            m_scared = false; // whilst we're technically still -scared-, we're open to other stimuli now.
+            m_cornered = true; // once cornered, we will no longer flee until we are lured first.
         }
     }
 

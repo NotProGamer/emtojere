@@ -69,18 +69,6 @@ public class Stairs : MonoBehaviour
                         npcScript.Teleport(destination.position, GetDestinationFloor());
                     }
                 }
-                else
-                {
-                    if (Random.value >= teleportChance)
-                    {
-                        npcScript.Teleport(destination.position, GetDestinationFloor());
-                        //destination.gameObject.GetComponent<Stairs>().SetTimer(5f);
-                    }
-                    else
-                    {
-                        // keep moving
-                    }
-                }
             }
         }
     }
