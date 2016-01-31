@@ -12,6 +12,7 @@ public abstract class ClickBase : MonoBehaviour
     protected Animator animator;
 	protected Slider fearMeter;
 
+	PlayerAudio npcAudio;
     NPCScript npc;
     GameObject basementMarker;
     GameObject groundMarker;
@@ -26,6 +27,7 @@ public abstract class ClickBase : MonoBehaviour
 		fearMeter = GameObject.Find ("FearMeter").GetComponent<Slider> ();
 
         npc = GameObject.Find("PlayerCollider").GetComponent<NPCScript>();
+		npcAudio = GameObject.Find("PlayerCollider").GetComponent<PlayerAudio>();
 
         // determine what floor we are on using elevation markers.
         if      (transform.position.y > GameObject.Find("2").transform.position.y) floor = 2;
@@ -53,7 +55,7 @@ public abstract class ClickBase : MonoBehaviour
 
 			// alert player
             npc.Alert(transform.position, lure, floor, true);
-
+			npcAudio.React ();
 			fearMeter.value += fearIncrement;
         }
     }
