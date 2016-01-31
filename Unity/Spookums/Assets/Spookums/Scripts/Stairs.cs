@@ -57,8 +57,8 @@ public class Stairs : MonoBehaviour
 
             if (teleportTimer == 0 && npcScript.GetCurrentFloor() != GetDestinationFloor())
             {
-                // if npc is lured
-                if (npcScript.IsLured())
+                // if npc is lured or evacuating house
+                if (npcScript.IsLured() || npcScript.IsFleeing())
                 {
 					int df =  Mathf.Abs(npcScript.GetAlertFloor() - npcScript.GetCurrentFloor());
                     int ndf = Mathf.Abs(npcScript.GetAlertFloor() - GetDestinationFloor());

@@ -77,6 +77,11 @@ public class Game : MonoBehaviour
             UnPause();
         }
 
+        if (npc.IsFleeing())
+        {
+            currentState = GameState.LOSE;
+        }
+
         ProcessState();
     }
 

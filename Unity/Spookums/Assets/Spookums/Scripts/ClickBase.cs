@@ -6,17 +6,16 @@ public abstract class ClickBase : MonoBehaviour
 {
 	[SerializeField] protected float fearIncrement = 0.5f;
 	[SerializeField] protected float fearThreshold = 4f;
-    [SerializeField] protected float cooldown = 5f;
+    [SerializeField]
+    protected float cooldown = 5f;
     protected float clickTime = 0f;
     protected AudioSource[] audioSources;
     protected Animator animator;
 	protected Slider fearMeter;
 
+    public bool isHouseExit = false;
+
     NPCScript npc;
-    GameObject basementMarker;
-    GameObject groundMarker;
-    GameObject firstFloorMarker;
-    GameObject secondFloorMarker;
     int floor;
 
     protected virtual void Start()
@@ -36,6 +35,8 @@ public abstract class ClickBase : MonoBehaviour
 
     protected virtual void OnMouseUpAsButton()
     {
+        if (isHouseExit || npc.IsFleeing()) return;
+
         if (Time.time > clickTime)
         {
             //Trigger animation and audio here
@@ -55,16 +56,26 @@ public abstract class ClickBase : MonoBehaviour
             npc.Alert(transform.position, lure, floor, true);
 
 			fearMeter.value += fearIncrement;
+
+            if (fearMeter.value >= 5.0f)
+            {
+                npc.EvacuateHouse();
+                npc.Alert(GameObject.Find("HouseExit").transform.position, true, 0, false);
+            }
         }
     }
 
     protected virtual void OnMouseOver()
     {
+        if (isHouseExit) return;
+
         animator.SetBool("MouseOver", true);
     }
 
     protected virtual void OnMouseExit()
     {
+        if (isHouseExit) return;
+
         animator.SetBool("MouseOver", false);
     }
 }

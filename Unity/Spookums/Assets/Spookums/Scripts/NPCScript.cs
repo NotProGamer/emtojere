@@ -15,6 +15,7 @@ public class NPCScript : MonoBehaviour
     private bool m_cornered;
     float fearImmunityTimer;
     public float fearImmunityMax = 2.0f;
+    bool fleeing;
 
     private Vector3 m_target;
     private float hDir = 0f;
@@ -60,6 +61,16 @@ public class NPCScript : MonoBehaviour
         return m_scared;
     }
 
+    public void EvacuateHouse()
+    {
+        fleeing = true;
+    }
+
+    public bool IsFleeing()
+    {
+        return fleeing;
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -77,6 +88,7 @@ public class NPCScript : MonoBehaviour
         m_scared = false;
         m_cornered = false;
         fearImmunityTimer = 0.0f;
+        fleeing = false;
 
         // populate stairs list
         Object[] objects = FindObjectsOfType(typeof(GameObject));
@@ -163,7 +175,7 @@ public class NPCScript : MonoBehaviour
 
     public void Alert(Vector3 source, bool lure, int floor, bool useDelay = true)
     {
-        if (m_paused || fadingDown || fadingUp || m_scared || fearImmunityTimer > 0) return;
+        if (m_paused || fadingDown || fadingUp || (m_scared && !fleeing) || fearImmunityTimer > 0) return;
 
         if (useDelay)
             m_reactionTimer = reactionDelay;
@@ -172,6 +184,7 @@ public class NPCScript : MonoBehaviour
 
         alertLocation = source;
         alertFloor = floor;
+        m_target = Vector3.zero;
 
         if (lure || m_cornered) m_lured = true;
         else m_scared = true;
@@ -304,6 +317,9 @@ public class NPCScript : MonoBehaviour
                 if (m_reactionTimer == 0)
                 {
                     float speedFactor = m_lured ? 0.5f : 1.0f;
+
+                    if (fleeing) speedFactor = 1.5f;
+
                     m_rigidbody.velocity = new Vector2(movement * (maxSpeed * speedFactor), m_rigidbody.velocity.y);
                     // set speed animation 
                     //anim.SetFloat("Speed", Mathf.Abs(movement)); // horizontal speed
