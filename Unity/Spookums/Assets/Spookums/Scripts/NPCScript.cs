@@ -382,6 +382,8 @@ public class NPCScript : MonoBehaviour
     {
         if (m_paused) return;
 
+		GetComponent<PlayerAudio> ().Stairs ();
+
         //if (doFade)
         {
             currentFloor = newFloor;
