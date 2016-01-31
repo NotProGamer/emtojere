@@ -13,32 +13,36 @@ public class Game : MonoBehaviour
 
     public float maxTimer = 360;
     float timer;
-    float dt;
+    float dt; 
     bool paused;
     bool[] collectibles;
+    public bool goalCollected;
     GameState currentState;
+
+    public GameObject ladderExit;
 
     public NPCScript npc;
 
     void Init()
     {
         paused = false;
-        timer = maxTimer;
+        timer = maxTimer; // set game timer
 
+        // set collectables as not found
         for (int i = 0; i < collectibles.Length; i++)
             collectibles[i] = false;
 
         // place NPC at start position
-        //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0), false);
+        //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0), false); // depreciated
     }
 
     // Use this for initialization
     void Start ()
     {
-        collectibles = new bool[5];
+        collectibles = new bool[5]; // create collectibles array
         dt = Time.deltaTime;
 
-        Init();
+        Init(); // reset level 
 
         currentState = GameState.PLAY;
     }
@@ -53,6 +57,13 @@ public class Game : MonoBehaviour
         {
             timer -= dt;
 
+            // end the game if timer runs out
+            if (goalCollected)
+            {
+                //Pause();
+                currentState = GameState.WIN;
+            }
+
             if (timer <= 0)
             {
                 // end game with dawn sequence
@@ -63,7 +74,17 @@ public class Game : MonoBehaviour
             if (EverythingCollected())
             {
                 // unlock attic
+                if (ladderExit != null)
+                {
+                    ladderExit.GetComponent<ToggleStairs>().enableStairs = true;
+                }
+                else
+                {
+                    Debug.Log("LadderExit is null");
+                }
+                
             }
+             
         }
 
         // handle inputs
@@ -75,6 +96,11 @@ public class Game : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Escape) && paused)
         {
             UnPause();
+        }
+
+        if (npc.IsFleeing())
+        {
+            currentState = GameState.LOSE;
         }
 
         ProcessState();

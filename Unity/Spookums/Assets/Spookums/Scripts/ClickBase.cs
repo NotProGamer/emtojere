@@ -6,17 +6,17 @@ public abstract class ClickBase : MonoBehaviour
 {
 	[SerializeField] protected float fearIncrement = 0.5f;
 	[SerializeField] protected float fearThreshold = 4f;
-    [SerializeField] protected float cooldown = 5f;
+    [SerializeField]
+    protected float cooldown = 5f;
     protected float clickTime = 0f;
     protected AudioSource[] audioSources;
     protected Animator animator;
 	protected Slider fearMeter;
 
+    public bool isHouseExit = false;
+
+	PlayerAudio npcAudio;
     NPCScript npc;
-    GameObject basementMarker;
-    GameObject groundMarker;
-    GameObject firstFloorMarker;
-    GameObject secondFloorMarker;
     int floor;
 
     protected virtual void Start()
@@ -26,6 +26,7 @@ public abstract class ClickBase : MonoBehaviour
 		fearMeter = GameObject.Find ("FearMeter").GetComponent<Slider> ();
 
         npc = GameObject.Find("PlayerCollider").GetComponent<NPCScript>();
+		npcAudio = GameObject.Find("PlayerCollider").GetComponent<PlayerAudio>();
 
         // determine what floor we are on using elevation markers.
         if      (transform.position.y > GameObject.Find("2").transform.position.y) floor = 2;
@@ -36,6 +37,8 @@ public abstract class ClickBase : MonoBehaviour
 
     protected virtual void OnMouseUpAsButton()
     {
+        if (isHouseExit || npc.IsFleeing()) return;
+
         if (Time.time > clickTime)
         {
             //Trigger animation and audio here
@@ -53,18 +56,28 @@ public abstract class ClickBase : MonoBehaviour
 
 			// alert player
             npc.Alert(transform.position, lure, floor, true);
-
+			npcAudio.React ();
 			fearMeter.value += fearIncrement;
+
+            if (fearMeter.value >= 5.0f)
+            {
+                npc.EvacuateHouse();
+                npc.Alert(GameObject.Find("HouseExit").transform.position, true, 0, false);
+            }
         }
     }
 
     protected virtual void OnMouseOver()
     {
+        if (isHouseExit) return;
+
         animator.SetBool("MouseOver", true);
     }
 
     protected virtual void OnMouseExit()
     {
+        if (isHouseExit) return;
+
         animator.SetBool("MouseOver", false);
     }
 }

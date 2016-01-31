@@ -18,9 +18,5 @@ public class HUD : MonoBehaviour {
 	void Update () {
         timeMeter.GetComponent<Slider>().value = (game.maxTimer - game.GetTimer()) / game.maxTimer;
 //        fearMeter.GetComponent<Slider>().value = npc.GetFear();
-        foreach(GameObject c in collectibles)
-        {
-            c.GetComponent<Image>().color = Color.gray;
-        }
     }
 }
