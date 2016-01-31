@@ -22,6 +22,9 @@ public class Stairs : MonoBehaviour
         else if (transform.position.y > GameObject.Find("1").transform.position.y) floor = 1;
         else if (transform.position.y > GameObject.Find("G").transform.position.y) floor = 0;
         else floor = -1;
+
+        if (floor == 2)
+            floor = 1;
     }
 
     // Update is called once per frame
@@ -66,7 +69,10 @@ public class Stairs : MonoBehaviour
                     if (npcScript.GetAlertFloor() == GetDestinationFloor() ||
                          ndf < df)
                     {
-                        npcScript.Teleport(destination.position, GetDestinationFloor());
+                        if (GetDestinationFloor() == 2)
+                            npcScript.Teleport(new Vector3(destination.position.x, destination.position.y + 2, destination.position.z), GetDestinationFloor());
+                        else
+                            npcScript.Teleport(destination.position, GetDestinationFloor());
                     }
                 }
             }

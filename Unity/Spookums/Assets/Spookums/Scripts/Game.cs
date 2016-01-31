@@ -18,6 +18,7 @@ public class Game : MonoBehaviour
     bool[] collectibles;
     public bool goalCollected;
     GameState currentState;
+    int collectibleCount;
 
 
     public Texture2D loseMenuTexture;
@@ -28,6 +29,11 @@ public class Game : MonoBehaviour
     public GameObject ladderExit;
 
     public NPCScript npc;
+
+    public void Pickup()
+    {
+        collectibleCount++;
+    }
 
     void Init()
     {
@@ -40,6 +46,7 @@ public class Game : MonoBehaviour
 
         // place NPC at start position
         //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0), false); // depreciated
+        collectibleCount = 0;
     }
 
     // Use this for initialization
@@ -114,13 +121,13 @@ public class Game : MonoBehaviour
 
     bool EverythingCollected()
     {
-        foreach (bool c in collectibles)
-        {
-            if (!c)
-                return false;
-        }
+        //foreach (bool c in collectibles)
+        //{
+        //    if (!c)
+        //        return false;
+        //}
 
-        return false;
+        return collectibleCount >= 5;//false;
     }
 
     public string GetTimeAsString()

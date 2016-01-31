@@ -9,6 +9,7 @@ public class PickUp : MonoBehaviour {
 	public GameObject inventory;
 	public Sprite itemSprite;
     public bool destroyOnPickUp = false;
+    public Game gameManager;
 
 	private AudioSource audioClip;
 
@@ -26,6 +27,7 @@ public class PickUp : MonoBehaviour {
 	void Start(){
 		audioClip = GetComponent<AudioSource> ();
 		inventory = GameObject.Find ("Inventory");
+        gameManager = GameObject.Find("GameManager").GetComponent<Game>();
 	}
 
     void OnTriggerEnter2D(Collider2D other)
@@ -39,13 +41,13 @@ public class PickUp : MonoBehaviour {
             if (destroyOnPickUp)
             {
                 Destroy(gameObject);
-                RegisterPickup();
             }
             else
             {
 				transform.position = new Vector2 (-100, -100);
 				Debug.Log ((int)inventoryIndex);
 				inventory.transform.GetChild((int)inventoryIndex).GetComponent<Image>().sprite = itemSprite;
+                RegisterPickup();
             }
         }
     }
@@ -54,6 +56,7 @@ public class PickUp : MonoBehaviour {
     {
         if (m_paused) return;
 
+        gameManager.Pickup();
         //gameObject.transform.Find("GameManager").GetComponent<Game>().RegisterPickup(inventoryIndex);
     }
 
