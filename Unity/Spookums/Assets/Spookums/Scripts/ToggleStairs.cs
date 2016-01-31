@@ -8,8 +8,9 @@ public class ToggleStairs : MonoBehaviour {
     public Vector3 stopPosition;
     public float maxSpeed = 1f;
     private bool atticUnlocked = false;
+    public GameObject coverSprite;
 
-	public float distance = 4;
+    public float distance = 4;
 
     // Use this for initialization
     void Start ()
@@ -68,6 +69,8 @@ public class ToggleStairs : MonoBehaviour {
         {
             atticUnlocked = enabled;
             stairsScript.enabled = enabled;
+            //coverSprite.SetActive(false);
+            GameObject.Find("CoverSprite").GetComponent<CoverController>().coverTimer = 1.5f;
             if (enabled == false)
             {
                 //stairsScript.enabled = enabled;

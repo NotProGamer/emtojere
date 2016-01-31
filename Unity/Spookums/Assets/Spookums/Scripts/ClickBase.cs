@@ -73,7 +73,12 @@ public abstract class ClickBase : MonoBehaviour
     {
         if (isHouseExit) return;
 
-        animator.SetBool("MouseOver", true);
+        if (Time.time > clickTime)
+        {
+            animator.SetBool("MouseOver", true);
+        }
+        else
+            animator.SetBool("MouseOver", false);
     }
 
     protected virtual void OnMouseExit()
@@ -83,6 +88,7 @@ public abstract class ClickBase : MonoBehaviour
         animator.SetBool("MouseOver", false);
     }
 
-	protected virtual void Clicked(){
+	protected virtual void Clicked()
+    {
 	}
 }

@@ -70,7 +70,9 @@ public class Stairs : MonoBehaviour
                          ndf < df)
                     {
                         if (GetDestinationFloor() == 2)
+                        {
                             npcScript.Teleport(new Vector3(destination.position.x, destination.position.y + 2, destination.position.z), GetDestinationFloor());
+                        }
                         else
                             npcScript.Teleport(destination.position, GetDestinationFloor());
                     }
