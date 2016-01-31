@@ -132,18 +132,11 @@ public class Game : MonoBehaviour
 
     public string GetTimeAsString()
     {
-        if (timer <= 0)
-            return "0:00";
-
-        int minutes = (int)(timer / 60);
-        int seconds = (int)(timer % 60);
-
-        string result = minutes + ":";
-
-        if (seconds < 10)
-            result += "0";
-
-        return result + seconds;
+        int d = (int)(timer * 100.0f);
+        int minutes = d / (60 * 100);
+        int seconds = (d % (60 * 100)) / 100;
+        int hundredths = d % 100;
+        return string.Format("{0:00}:{1:00}.{2:00}", minutes, seconds, hundredths);
     }
 
     public float GetTimer()
