@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
-public class Stairs : MonoBehaviour {
-
+public class Stairs : MonoBehaviour
+{
     private bool m_paused;
 
     public bool open = true;
@@ -10,17 +10,23 @@ public class Stairs : MonoBehaviour {
     public float teleportTimer = 0f;
     public float teleportChance = 0.5f;
 
+    public float levelDistance = 0.1f;
+
+    int floor;
+
     // Use this for initialization
     void Start()
     {
-
+        // determine what floor we are on using elevation markers.
+        if      (transform.position.y > GameObject.Find("2").transform.position.y) floor = 2;
+        else if (transform.position.y > GameObject.Find("1").transform.position.y) floor = 1;
+        else if (transform.position.y > GameObject.Find("G").transform.position.y) floor = 0;
+        else floor = -1;
     }
-
 
     // Update is called once per frame
     void Update()
     {
-
         if (m_paused) return;
 
         if (teleportTimer > 0)
@@ -42,50 +48,49 @@ public class Stairs : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("Collision");
         if (m_paused) return;
 
         if (other.gameObject.tag == "NPC")
         {
-            if (teleportTimer == 0)
+            NPCScript npcScript = other.GetComponent<NPCScript>();
+
+            if (teleportTimer == 0 && npcScript.GetCurrentFloor() != GetDestinationFloor())
             {
-                //other.GetComponent<NPCScript>().Teleport(destination.position);
-
-                NPCScript npcScript = other.GetComponent<NPCScript>();
-
-                // if npc is lured 
+                // if npc is lured
                 if (npcScript.IsLured())
                 {
-                    //if target and destination are on the same level but not this level then teleport
-                    if (GetDirection(npcScript.GetTarget()) == GetDirection(destination.position)
-                        && GetDirection(npcScript.GetTarget()) != LureDirection.Across)
+					int df =  Mathf.Abs(npcScript.GetAlertFloor() - npcScript.GetCurrentFloor());
+                    int ndf = Mathf.Abs(npcScript.GetAlertFloor() - GetDestinationFloor());
+					
+                    if (npcScript.GetAlertFloor() == GetDestinationFloor() ||
+                         ndf < df)
                     {
-                        npcScript.Teleport(destination.position);
-                        destination.gameObject.GetComponent<Stairs>().SetTimer(2f);
-                    }
-                }
-                else
-                {
-                    if (Random.value >= teleportChance)
-                    {
-                        npcScript.Teleport(destination.position);
-                        destination.gameObject.GetComponent<Stairs>().SetTimer(2f);
-                    }
-                    else
-                    {
-                        // keep moving
+                        npcScript.Teleport(destination.position, GetDestinationFloor());
                     }
                 }
             }
         }
     }
 
+    public int GetFloor()
+    {
+        return floor;
+    }
+
+    public int GetDestinationFloor()
+    {
+        // if the destination is above us, we go to the floor above, and vice versa
+        return (destination.transform.position.y > transform.position.y) ? (floor + 1) : (floor - 1);
+    }
+
     LureDirection GetDirection(Vector3 target)
     {
-        if (target.y - transform.position.y >= 2)
+        if (target.y - transform.position.y >= levelDistance)
         {
             return LureDirection.Up;
         }
-        else if (target.y - transform.position.y >= -2)
+        else if (target.y - transform.position.y <= -levelDistance)
         {
             return LureDirection.Down;
         }
@@ -93,8 +98,6 @@ public class Stairs : MonoBehaviour {
         {
             return LureDirection.Across;
         }
-
-
     }
 
     enum LureDirection

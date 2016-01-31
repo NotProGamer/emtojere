@@ -1,14 +1,14 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class Game : MonoBehaviour
 {
     enum GameState
     {
+        PLAY,
         WIN,
         LOSE,
         PAUSE,
-        PLAY
     };
 
     public float maxTimer = 360;
@@ -29,7 +29,7 @@ public class Game : MonoBehaviour
             collectibles[i] = false;
 
         // place NPC at start position
-        //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0));
+        //npc.Teleport(new Vector3((float)-5.45, (float)-1.8, 0), false);
     }
 
     // Use this for initialization
@@ -56,6 +56,7 @@ public class Game : MonoBehaviour
             if (timer <= 0)
             {
                 // end game with dawn sequence
+                Pause();
                 currentState = GameState.LOSE;
             }
 
@@ -69,16 +70,7 @@ public class Game : MonoBehaviour
         // ESC : Pause Game or Resume Game
         if (Input.GetKeyDown(KeyCode.Escape) && !paused)
         {
-            // tell all gameobjects to pause
-            Object[] objects = FindObjectsOfType(typeof(GameObject));
-
-            foreach (GameObject g in objects)
-            {
-                g.SendMessage("OnPause", SendMessageOptions.DontRequireReceiver);
-            }
-
-            paused = true;
-            currentState = GameState.PAUSE;
+            Pause();
         }
         else if (Input.GetKeyDown(KeyCode.Escape) && paused)
         {
@@ -120,6 +112,20 @@ public class Game : MonoBehaviour
         return timer;
     }
 
+    void Pause()
+    {
+        // tell all gameobjects to pause
+        Object[] objects = FindObjectsOfType(typeof(GameObject));
+
+        foreach (GameObject g in objects)
+        {
+            g.SendMessage("OnPause", SendMessageOptions.DontRequireReceiver);
+        }
+
+        paused = true;
+        currentState = GameState.PAUSE;
+    }
+
     public void UnPause()
     {
         // tell all gameobjects to resume
@@ -136,8 +142,7 @@ public class Game : MonoBehaviour
 
     public void Restart()
     {
-        Init();
-        currentState = GameState.PLAY;
+        Application.LoadLevel(0);
     }
 
     public void Quit()
@@ -182,6 +187,7 @@ public class Game : MonoBehaviour
             if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "Yes"))
             {
                 paused = false;
+                currentState = GameState.PLAY;
                 Restart();
             }
 
@@ -221,5 +227,10 @@ public class Game : MonoBehaviour
         {
             currentState = GameState.WIN;
         }
+    }
+
+    public bool IsShowingMenu()
+    {
+        return currentState == GameState.LOSE || currentState == GameState.WIN;
     }
 }
