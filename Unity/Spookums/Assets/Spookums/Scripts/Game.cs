@@ -19,6 +19,12 @@ public class Game : MonoBehaviour
     public bool goalCollected;
     GameState currentState;
 
+
+    public Texture2D loseMenuTexture;
+    public Texture2D winMenuTexture;
+    public Texture2D replayButtonTexture;
+    public Texture2D exitButtonTexture;
+
     public GameObject ladderExit;
 
     public NPCScript npc;
@@ -203,21 +209,30 @@ public class Game : MonoBehaviour
         // Game Over screen
         if (currentState == GameState.LOSE)
         {
-            int menuWidth = 190;
-            int menuHeight = 70;
+            int menuWidth = 450;
+            int menuHeight = 225;
+            int buttonWidth = 204;
+            int buttonHeight = 54;
 
             // Make a background box
-            GUI.Box(new Rect((Screen.width - menuWidth) / 2, (Screen.height - menuHeight) / 2, menuWidth, menuHeight), "GAME OVER!\nTry again?");
+            GUIStyle currentStyle = new GUIStyle(GUI.skin.box);
+            currentStyle.normal.background = MakeTex(2, 2, new Color(0f, 0f, 0f, 0.0f));
+            GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
+            GUI.Box(new Rect((Screen.width - menuWidth) / 2, (Screen.height - menuHeight) / 2, menuWidth, menuHeight), loseMenuTexture, currentStyle);
+
+            /*
+             *  Sam's note: I am *so* sorry about the position calculation
+             */
 
             // Resume
-            if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "Yes"))
+            if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth, Screen.height / 2 + buttonHeight / 2, buttonWidth, buttonHeight), replayButtonTexture, currentStyle))
             {
                 paused = false;
-                currentState = GameState.PLAY;
                 Restart();
             }
 
-            if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10 + 90, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "No"))
+            // Restart
+            if (GUI.Button(new Rect(Screen.width / 2, Screen.height / 2 + buttonHeight / 2, buttonWidth, buttonHeight), exitButtonTexture, currentStyle))
             {
                 paused = false;
                 Quit();
@@ -226,23 +241,33 @@ public class Game : MonoBehaviour
 
         if (currentState == GameState.WIN)
         {
-            int menuWidth = 190;
-            int menuHeight = 70;
+            int menuWidth = 450;
+            int menuHeight = 225;
+            int buttonWidth = 204;
+            int buttonHeight = 54;
 
             // Make a background box
-            GUI.Box(new Rect((Screen.width - menuWidth) / 2, (Screen.height - menuHeight) / 2, menuWidth, menuHeight), "Congratulations, you win!\nPlay again?");
+            GUIStyle currentStyle = new GUIStyle(GUI.skin.box);
+            currentStyle.normal.background = MakeTex(2, 2, new Color(0f, 0f, 0f, 0.0f));
+            GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
+            GUI.Box(new Rect((Screen.width - menuWidth) / 2, (Screen.height - menuHeight) / 2, menuWidth, menuHeight), winMenuTexture, currentStyle);
+
+            /*
+             *  Sam's note: I am *so* sorry about the position calculation
+             */
 
             // Resume
-            if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "Yes"))
+            if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth, Screen.height / 2 + buttonHeight / 2, buttonWidth, buttonHeight), replayButtonTexture, currentStyle))
             {
-                paused = false;
-                Restart();
+                    paused = false;
+                    Restart();
             }
 
-            if (GUI.Button(new Rect(((Screen.width - menuWidth) / 2) + 10 + 90, ((Screen.height - menuHeight) / 2) + 40, 80, 20), "No"))
+            // Restart
+            if (GUI.Button(new Rect(Screen.width / 2, Screen.height / 2 + buttonHeight / 2, buttonWidth, buttonHeight), exitButtonTexture, currentStyle))
             {
-                paused = false;
-                Quit();
+                    paused = false;
+                    Quit();
             }
         }
     }
@@ -258,5 +283,18 @@ public class Game : MonoBehaviour
     public bool IsShowingMenu()
     {
         return currentState == GameState.LOSE || currentState == GameState.WIN;
+    }
+
+    private Texture2D MakeTex(int width, int height, Color col)
+    {
+        Color[] pix = new Color[width * height];
+        for (int i = 0; i < pix.Length; ++i)
+        {
+            pix[i] = col;
+        }
+        Texture2D result = new Texture2D(width, height);
+        result.SetPixels(pix);
+        result.Apply();
+        return result;
     }
 }
