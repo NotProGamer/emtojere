@@ -1,4 +1,6 @@
-##Spookums' Spooky House
+#Spookums' Spooky House
+
+##Game Synopsis
 You are a ghost, cursed to roam a haunted house for all eternity, that is until you can find an unwitting soul to prepare the resurrection ceremony. Sally has just knocked on your door... Now is your chance! Click on the furniture scattered through the house to spook Sally into doing your bidding. She will collect the ritual items as she goes and when she has all 5, the resurrection room will open. Take care though, spooking Sally too much will send her running from the house in fear. (bleurgh!)
 
 ## Game Jam
@@ -37,6 +39,17 @@ Tim Whitt
 Tom Chataway
 
 Torbjorn Van Heeswijck
+
+## Screenshots
+
+![screenshot splash screen](https://raw.githubusercontent.com/NotProGamer/emtojere/master/Screenshots/Spookums_Splash.png)
+
+![screenshot 1](https://raw.githubusercontent.com/NotProGamer/emtojere/master/Screenshots/Spookums_1.png)
+
+![screenshot 2](https://raw.githubusercontent.com/NotProGamer/emtojere/master/Screenshots/Spookums_2.png)
+
+![screenshot 3](https://raw.githubusercontent.com/NotProGamer/emtojere/master/Screenshots/Spookums_3.png)
+
 
 ##License
 The MIT License (MIT)
