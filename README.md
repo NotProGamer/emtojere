@@ -11,11 +11,17 @@ AIE Adelaide Campus
 * Gandhi's Game: This game must have zero violence in its game play. Conflicts must have resolutions based on logic.
 * One hand tied behind my back: Create a game that can be played with only one hand. On mobile just one hand holding and playing at the same time i.e. just play with your thumb. Desktop, mouse only or keyboard only.
 * To infinity and beyond!: Your world is procedurally generated.
+
 ##Platforms
+
 MS Windows
-Tools and Technologies: 
+
+#Tools and Technologies 
+
 .Net, Unity (any product)
+
 ##Credits 
+
 Team Spookums consists of: 
 
 Emma McIntosh
