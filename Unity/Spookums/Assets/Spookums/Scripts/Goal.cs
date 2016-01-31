@@ -18,10 +18,12 @@ public class Goal : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Destroy(gameObject);
-        if (gameScript != null)
-        {
-            gameScript.goalCollected = true;
-        }
+		if (other.tag == "NPC") {
+			Destroy(gameObject);
+			if (gameScript != null)
+			{
+				gameScript.goalCollected = true;
+			}
+		}
     }
 }

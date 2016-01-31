@@ -9,12 +9,14 @@ public class ToggleStairs : MonoBehaviour {
     public float maxSpeed = 1f;
     private bool atticUnlocked = false;
 
+	public float distance = 4;
+
     // Use this for initialization
     void Start ()
     {
         stairsScript = gameObject.GetComponent<Stairs>();
         startPosition = transform.position;
-        stopPosition = new Vector3(startPosition.x, startPosition.y - 4, startPosition.z);
+        stopPosition = new Vector3(startPosition.x, startPosition.y - distance, startPosition.z);
     }
 
     public bool enableStairs = false;

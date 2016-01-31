@@ -3,6 +3,10 @@ using System.Collections;
 
 public class Door : ClickBase {
 
+	void Awake(){
+		clickable = false;
+	}
+
     void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log("Hit");
@@ -10,11 +14,18 @@ public class Door : ClickBase {
         {
             animator.SetTrigger("OpenRight");
             audioSources[1].Play();
+			clickable = true;
         }
         else {
             animator.SetTrigger("OpenLeft");
             audioSources[1].Play();
+			clickable = true;
+
         }
     }
+
+	protected override void Clicked(){
+		clickable = false;
+	}
 
 }
