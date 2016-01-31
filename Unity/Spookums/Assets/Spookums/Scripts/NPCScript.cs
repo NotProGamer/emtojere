@@ -6,7 +6,7 @@ public class NPCScript : MonoBehaviour
     private bool m_paused;
     private Vector3 m_playVelocity;
 
-    public float maxSpeed = 5f;
+    public float maxSpeed;
     private bool m_facingRight = true;
     int currentFloor;
 
@@ -38,6 +38,8 @@ public class NPCScript : MonoBehaviour
     Vector3 m_destination;
     public SpriteRenderer sprite;
 
+    public Animator animator;
+
     // source-seeking data
     Vector3 alertLocation;
     int alertFloor;
@@ -63,6 +65,7 @@ public class NPCScript : MonoBehaviour
 
     public void EvacuateHouse()
     {
+        GetComponent<PlayerAudio>().Fleeing();
         fleeing = true;
     }
 
@@ -104,6 +107,20 @@ public class NPCScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Mathf.Abs(m_rigidbody.velocity.x) > 1)
+        {
+            animator.SetBool("Walk", true);
+        }
+        else {
+            animator.SetBool("Walk", false);
+        }
+
+        if (Mathf.Abs(m_rigidbody.velocity.x) > 3)
+            animator.SetBool("Run", true);
+        else {
+            animator.SetBool("Run", false);
+        }
+
         if (m_paused) return;
 
         if (fadingDown)

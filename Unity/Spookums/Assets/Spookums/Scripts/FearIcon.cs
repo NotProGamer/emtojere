@@ -9,6 +9,7 @@ public class FearIcon : MonoBehaviour {
 	public AudioSource heartbeat;
 	public AudioSource music;
 	public AudioSource background;
+    public NPCScript playerScript;
 
 	private Image face;
 	private float fear;
@@ -20,6 +21,8 @@ public class FearIcon : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		fear = fearMeter.value;
+
+        playerScript.maxSpeed = Mathf.Lerp(2.5f, 5f, fear / fearMeter.maxValue);
 
 		face.sprite = faces [Mathf.RoundToInt(fear)];
 

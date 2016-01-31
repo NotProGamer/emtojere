@@ -9,6 +9,7 @@ public class PlayerAudio : MonoBehaviour {
 	public AudioClip[] huh;
 	public AudioClip[] scream;
 	public AudioClip[] screamLong;
+    public AudioClip[] screamExtraLong;
 	public AudioClip stairs;
 	public Slider fearMeter;
 
@@ -47,23 +48,29 @@ public class PlayerAudio : MonoBehaviour {
 		movement.Play ();
 	}
 
-	public void React(){
-		switch (Mathf.RoundToInt (fearMeter.value)) {
-		case 0:
-		case 1:
-		case 2:
-			vocals.clip = huh [Random.Range (0, huh.Length)];
-			vocals.PlayDelayed (0.75f);
-			break;
-		case 3:
-		case 4:
-			vocals.clip = scream [Random.Range (0, scream.Length)];
-			vocals.PlayDelayed (0.5f);
-			break;
-		case 5:
-			vocals.clip = screamLong [Random.Range (0, scream.Length)];
-			vocals.PlayDelayed (0.25f);
-			break;
-		}
+    public void React()
+    {
+        switch (Mathf.RoundToInt(fearMeter.value))
+        {
+            case 0:
+            case 1:
+            case 2:
+                vocals.clip = huh[Random.Range(0, huh.Length)];
+                vocals.PlayDelayed(0.75f);
+                break;
+            case 3:
+            case 4:
+                vocals.clip = scream[Random.Range(0, scream.Length)];
+                vocals.PlayDelayed(0.5f);
+                break;
+            case 5:
+                vocals.clip = screamLong[Random.Range(0, scream.Length)];
+                vocals.PlayDelayed(0.25f);
+                break;
+        }
+    }
+    public void Fleeing() {
+        vocals.clip = screamExtraLong[Random.Range(0, screamExtraLong.Length)];
+        vocals.PlayDelayed(0.25f);
 	}
 }
