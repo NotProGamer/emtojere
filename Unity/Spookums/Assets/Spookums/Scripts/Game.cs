@@ -163,7 +163,7 @@ public class Game : MonoBehaviour
 
     public void Restart()
     {
-        Application.LoadLevel(0);
+        Application.LoadLevel(1);
     }
 
     public void Quit()
